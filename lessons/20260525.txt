@@ -1,0 +1,71 @@
+* 牛客网在线编程，使用input()接收数据，用print()输出结果，因此需要对输入数据预处理。
+* 常用预处理函数：split()->list[str]方法，map()函数; etc. map(int, input().split())
+* 对于多行数据，使用：
+import sys
+ipt=[]
+for line in sys.stdin:
+   ipt+=[line]
+
+##################################################
+##################################################
+
+noob40 二维斐波那契数列
+https://www.nowcoder.com/share/jump/1902545211779705913146
+
+* "x mod y" in python : x % y
+* (x + y) mod z = ( (x mod z) + (y mod z) ) mod z 
+* python : [[0]*4]*5 = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+
+ans:
+n, m = map(int, input().split())
+z=10**9+7
+a=[[1]*(m+1)]*(n+1)
+
+for i in range(2, n + 1):
+    for j in range(2, m + 1):
+            a[i][j] = (a[i - 1][j] + a[i][j - 1]) % z
+
+print(a[n][m])
+
+##################################################
+##################################################
+
+noob46 约瑟夫环 
+https://www.nowcoder.com/share/jump/1902545211779707483545
+
+* python : list的pop()方法，弹出指定idx位置的元素
+
+ans:
+n,k,m=map(int,input().split())
+a=list(range(0,n))
+
+while len(a)!=1:
+    pos=(k+m-1)%len(a)
+    a.pop(pos)
+    k=pos%len(a)
+
+print(a[0])
+
+
+##################################################
+##################################################
+
+noob42 左侧严格小于计数 
+https://www.nowcoder.com/share/jump/1902545211779710461216
+
+ans:
+import sys
+ipt=[]
+for line in sys.stdin:
+    ipt+=[line.split()]
+
+a=list(map(int,ipt[1]))
+b=[0]*len(a)
+
+for i in range(len(a)):
+    cnt=0
+    for j in range(i):
+        if a[j]<a[i]:cnt+=1
+    b[i]=cnt
+
+print(*b)
