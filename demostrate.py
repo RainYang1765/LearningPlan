@@ -2,6 +2,8 @@ class ListNode:
     def __init__(self, x):
         self.val = x
         self.next = None
+        self.idx = None
+        self.prev = None
     def __iter__(self):
         yield self
         if self.next:
@@ -23,6 +25,5 @@ def Str2ListNode(istr: str) -> ListNode:
     return vals[0]
 
 head=Str2ListNode("{1,2,3,4}")
-
 for item in head:print(item)
 pass
