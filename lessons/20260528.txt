@@ -1,0 +1,110 @@
+noob118 判断一个链表是否为回文结构 
+https://www.nowcoder.com/share/jump/1902545211779869580587
+
+ans:
+class Solution:
+    def isPail(self , head: ListNode) -> bool:
+        # write code here
+        if head.next==None: return True
+        #
+        vals=[head.val]
+        node=head
+        while node.next!=None:
+            node=node.next
+            vals+=[node.val]
+        #
+        i=0
+        l=len(vals)
+        while i<=l/2:
+            if vals[i]!=vals[l-i-1]:
+                return False
+            i+=1
+        #
+        return True
+###########################################################
+###########################################################
+
+noob116 合并两个排序的链表 
+
+
+ans1:
+class Solution:
+    def Merge(self , pHead1: ListNode, pHead2: ListNode) -> ListNode:
+        # write code here
+        if pHead1==None:return pHead2
+        if pHead2==None:return pHead1
+        #
+        result=ListNode(-1001)
+        node=result
+        while pHead1!=None and pHead2!=None:
+            if pHead1.val<=pHead2.val:
+                node.next=pHead1
+                pHead1=pHead1.next
+            else:
+                node.next=pHead2
+                pHead2=pHead2.next
+            node=node.next
+        #
+        if pHead1!=None:node.next=pHead1
+        if pHead2!=None:node.next=pHead2
+        return result.next
+
+ans2 -- lambda sort:
+class Solution:
+    def Merge(self , pHead1: ListNode, pHead2: ListNode) -> ListNode:
+        # write code here
+        if pHead1==None:return pHead2
+        if pHead2==None:return pHead1
+        #
+        all_node=[pHead1,pHead2]
+        curr=pHead1
+        while curr.next!=None:
+            curr=curr.next
+            all_node+=[curr]
+        curr=pHead2
+        while curr.next!=None:
+            curr=curr.next
+            all_node+=[curr]
+        all_node.sort(key=lambda x:x.val)
+        for i in range(len(all_node)-1):
+            all_node[i].next=all_node[i+1]
+        return all_node[0]
+
+###########################################################
+###########################################################
+
+noob113 反转链表 
+https://www.nowcoder.com/share/jump/1902545211779874857136
+
+ans1 -- stack:
+class Solution:
+    def ReverseList(self , head: ListNode) -> ListNode:
+        # write code here
+        if head==None:return None
+        if head.next==None:return head
+        nodes=[head]
+        curr=head
+        while curr.next!=None:
+            curr=curr.next
+            nodes+=[curr]
+        for i in range(len(nodes)-2):
+            nodes[len(nodes)-i-1].next=nodes[len(nodes)-i-2]
+        nodes[1].next=nodes[0]
+        nodes[0].next=None
+        return nodes[len(nodes)-1]
+
+ans2 -- dual pointers:
+class Solution:
+    def ReverseList(self , head: ListNode) -> ListNode:
+        # write code here
+        if head==None or head.next==None:
+            return head
+        #
+        curr=None
+        pre=head
+        while pre!=None:
+            temp=pre.next
+            pre.next=curr
+            curr=pre
+            pre=temp
+        return curr
