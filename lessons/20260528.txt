@@ -25,7 +25,7 @@ class Solution:
 ###########################################################
 
 noob116 合并两个排序的链表 
-
+https://www.nowcoder.com/share/jump/1902545211779951861923
 
 ans1:
 class Solution:
