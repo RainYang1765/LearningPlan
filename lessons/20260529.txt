@@ -1,0 +1,48 @@
+Sample : 2, 170, 68, 85, 90, 47, 812, 24
+
+冒泡排序-bubble sort 时间复杂度n^2 空间复杂度1
+*改良：选择排序
+
+###########################################################
+###########################################################
+
+*opt 插入排序
+*改良：希尔排序
+
+###########################################################
+###########################################################
+
+快速排序-quick sort 时间复杂度nlogn 空间复杂度logn
+
+python:
+def QuickSort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[0]
+    left = [x for x in arr[1:] if x < pivot]
+    right = [x for x in arr[1:] if x >= pivot]
+    return quick_sort(left) + [pivot] + quick_sort(right)
+
+###########################################################
+###########################################################
+
+基数排序-radix sort 时间复杂度n*k 空间复杂度n+k (n为序列长度，k是最大数字的位数)
+*类似：计数排序，桶排序
+
+python:
+def RadixSort(a:list):
+    radix=[]
+    for _ in range(10):radix+=[[]]
+    max_val=max(a)
+    exp=1
+    while max_val//exp >0:
+        while len(a)>0:
+            temp=a.pop()
+            radix_idx=(temp//exp)%10
+            radix[radix_idx].append(temp)
+        #
+        for bucket in radix:
+            while len(bucket)>0:
+                a.append(bucket.pop())
+        exp*=10
+    return
