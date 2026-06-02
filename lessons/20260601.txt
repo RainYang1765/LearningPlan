@@ -1,0 +1,40 @@
+*BFS复习
+
+BM26 求二叉树的层序遍历
+https://www.nowcoder.com/share/jump/1902545211780313974340 
+
+ans:
+class Solution:
+    def levelOrder(self , root: TreeNode) -> List[List[int]]:
+        # write code here
+        def BFSTree(root:TreeNode)->list[list[int]]:
+            if not root: return []
+            q:list[TreeNode]=[root]
+            layer_idx:list[int]=[0]
+            ans:list[list[int]]=[]
+            while q:
+                node=q.pop(0)
+                layer=layer_idx.pop(0)
+                if node:
+                    if len(ans)==layer:
+                        ans.append([node.val])
+                    else:
+                        ans[layer].append(node.val)
+                    q.append(node.left)
+                    layer_idx.append(layer+1)
+                    q.append(node.right)
+                    layer_idx.append(layer+1)
+            return ans
+        #
+        return BFSTree(root)
+
+###############################################################
+###############################################################
+
+*DFS是和BFS相对的一种遍历策略
+**DFS即Depth First Search
+**DFS的核心是“先深入，后回溯”
+
+*DFS具体实现方法有三种
+**分别是前序遍历(Preorder)、中序遍历（Inorder）、后序遍历（Postorder）
+**前中后是二叉树中节点相对位置的表达，因此只适用于二叉树
