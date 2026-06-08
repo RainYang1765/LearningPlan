@@ -1,0 +1,41 @@
+*前序，中序，后序遍历的特点
+
+*二分查找
+
+二叉查找树-BST(Binary Search Tree)：对于树中每个节点X，它左子树中每个子节点的值都小于X的值，它右子树中每个子节点的值都大于X的值。
+*特征：中序遍历是一个严格递增的数组
+
+*利用二叉查找树查找元素：
+Python:
+def SearchBST(root: TreeNode, target: int) -> bool:
+    if not root:
+        return False
+    if root.val == target:
+        return True
+    elif root.val > target:
+        return SearchBST(root.left, target)
+    else:
+        return SearchBST(root.right, target)
+
+*验证二叉查找树：
+Python:
+def IsBST(root:TreeNode)->bool:
+    if not root:
+        return False
+    #
+    left_ans=IsBST(root.left)
+    #
+    if root.left.val<root.val<root.right.val:
+        return 
+
+
+BM41 输出二叉树的右视图 
+https://www.nowcoder.com/share/jump/1902545211780833767829
+
+BM40 重建二叉树 
+https://www.nowcoder.com/share/jump/1902545211780833787606
+
+B树
+
+红黑树
+

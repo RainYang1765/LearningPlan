@@ -3,7 +3,30 @@ class TreeNode:
         self.val = x
         self.left = None
         self.right = None
+        self.color = "black"  # 红黑树节点颜色，默认为黑色
 
+def SearchBST(root: TreeNode, target: int) -> bool:
+    if not root:
+        return False
+    if root.val == target:
+        return True
+    elif root.val > target:
+        return SearchBST(root.left, target)
+    else:
+        return SearchBST(root.right, target)
+
+def BinarySearch(a:list[int], target:int) -> int:
+    a.sort()
+    left, right = 0, len(a) - 1
+    while left <= right:
+        mid = left + (right - left) // 2
+        if a[mid] == target:
+            return mid
+        elif a[mid] > target:
+            right = mid - 1
+        else:
+            left = mid + 1
+    return -1
 
 def Str2Tree(istr: str) -> TreeNode:
     # pattern as {1,#,2,3}
@@ -80,6 +103,17 @@ def DFSTreePostorder(root: TreeNode):
         print("#", end=" ")
     return
 
+def MakeMaxheap(root:TreeNode) -> TreeNode:
+    if not root:
+        return None
+    left_max = MakeMaxheap(root.left)
+    right_max = MakeMaxheap(root.right)
+    if left_max and left_max.val > root.val:
+        root.val, left_max.val = left_max.val, root.val
+    if right_max and right_max.val > root.val:
+        root.val, right_max.val = right_max.val, root.val
+    return root
+
 def MakeMiniheap(root:TreeNode) -> TreeNode:
     if not root:
         return None
@@ -107,8 +141,36 @@ def TopK(a:list[int], k:int) -> list[int]:
                 heapq.heapreplace(min_heap, num)
     return sorted(min_heap, reverse=True)
 
+def HeapSort(a:list[int]) -> list[int]:
+    import heapq
+    heapq.heapify(a)
+    ans = []
+    while a:
+        ans.append(heapq.heappop(a))
+    return ans
+
+class ItemCount:
+    def __init__(self, item:str, count:int):
+        self.item = item
+        self.count = count
+
+    def __lt__(self, other):
+        return self.count < other.count
+
+    def __eq__(self, other):
+        return self.count == other.count
+
+    def __gt__(self, other):
+        return self.count > other.count
 
 if __name__ == "__main__":
-    tree_str = "{1,2,3,4,#,6,7,#,9}"
-    root = Str2Tree(tree_str)
-    BFSTree(root)
+    # tree_str = "{1,2,3,4,#,6,7,#,9}"
+    # root = Str2Tree(tree_str)
+    # BFSTree(root)
+    import heapq
+    a=[]
+    heapq.heappush(a, ItemCount("apple", 5))
+    heapq.heappush(a, ItemCount("banana", 3))
+    heapq.heappush(a, ItemCount("orange", 8))
+    for item in a:
+        print(f"{item.item}: {item.count}")

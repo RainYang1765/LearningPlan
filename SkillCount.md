@@ -2,7 +2,7 @@
 
 |numpy|2|
 |-|-|
-|kafka|1|
+|kafka RocketMQ|1|
 |机器学习（pytorch , tensorflow , caffe , etc.）|3|
 |AI异构加速|1|
 |机器视觉|1|
