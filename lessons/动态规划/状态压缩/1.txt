@@ -1,0 +1,60 @@
+REAL144 友好城市 
+https://www.nowcoder.com/share/jump/8045440981781541672217
+
+ans :
+n = int(input())
+G: list[list] = []
+for j in range(n):
+    G.append(list(map(int, input().split())))
+k = int(input())
+city_id = list(map(int, input().split()))
+for i in range(n):
+    for j in range(n):
+        if G[i][j] == -1:
+            if i == j:
+                G[i][j] = 0
+            else:
+                G[i][j] = float("inf")
+for m in range(n):
+    for i in range(n):
+        for j in range(n):
+            if G[i][j] > G[i][m] + G[m][j]:
+                G[i][j] = G[i][m] + G[m][j]
+sum_weight = 0
+dp = [float("inf") for _ in range(1 << (2 * k))]
+dp[0] = 0
+for mask in range(1 << (2 * k)):
+    count = bin(mask).count("1")
+    if count % 2 != 0:
+        continue
+
+    for i in range((2 * k)):
+        if mask & (1 << i):
+            continue
+        for j in range(i + 1, (2 * k)):
+            if mask & (1 << j):
+                continue
+            new_mask = mask | (1 << i) | (1 << j)
+            city1 = city_id[i] - 1
+            city2 = city_id[j] - 1
+            dp[new_mask] = min(dp[new_mask], dp[mask] + G[city1][city2])
+            #
+            if new_mask==0b1111:
+                if dp[new_mask]!=prev_new_mask:
+                    print(f"Transfer from {bin(mask)} {dp[mask]} by {city1} {city2} {G[city1][city2]}")
+            if (new_mask in [0b1100,0b11,0b1111]):
+                print(f"{bin(new_mask)} {bin(1<<i)} {bin(1<<j)} {dp[new_mask]}")
+            #
+            # print result:
+            # > 0b11 0b1 0b10 203
+            # > 0b1100 0b100 0b1000 96
+            # > Transfer from 0b11 203 by 5 0 96
+            #                  ^^^from 0b11 to 0b1111 : path weight 299
+            # > 0b1111 0b100 0b1000 299
+            # > Transfer from 0b101 89 by 4 0 196
+            #                  ^^^from 0b101 to 0b1111 : path weight 285<299, 
+            #                     update better path for 0b1111
+            # > 0b1111 0b10 0b1000 285
+            # > 0b1111 0b1 0b1000 285
+sum_weight = dp[(1 << (2 * k)) - 1]
+print(sum_weight)

@@ -1,0 +1,160 @@
+*最大流算法
+**边的权重作为边的容量
+*源:有向图中入度为0的点
+*汇:有向图中出度为0的点
+#**对于非源点非汇点的节点,总进入流量=总发出流量
+*残余图Gr:表示对于每条边还能再添加上多少流
+*增广通路:Gr中源点到汇点的路径
+**增广通路的最小值边就是可以添加到路径上每条边的流量
+*算法:
+    1. 确定图的源点s和汇点t,Gr从G复制得来
+    2. 利用Dijkstra算法,在Gr中得到一条从s到t的增广通路path,path中取容量最少的边的容量,作为path的最大流量min_flow
+    3. 在Gr中,对于path中每一条边<i,j>做以下操作:
+        3.1. 如果<i,j>的容量等于min_flow,则删除边<i,j>
+        3.2. 如果<i,j>的容量flow_ij大于min_flow,则把边<i,j>的容量大小设置为flow_ij-min_flow
+        3.3. 增加边<j,i>,容量为min_flow
+    4. 在Gr中重复2 -- 3,直到Gr中不存在s到t的增广通路
+
+
+*最小生成树:一个图G,其最小生成树是指,利用所有的节点和部分的边,构成一个树,并且其总权值和最低.
+**最小生成树存在当且仅当图是连通的.
+
+*Prim算法,无向图,以点为基础,不断选点构成最小生成树
+*它的策略是,使其连续地一步步长成,每一步,把一个节点当作根,并且往上加边,最终把相关联的节点加到树上,遍历策略是bfs
+**对于不连通的图的部分,分别处理,最后得到一个最小生成树的集合,即"最小生成树森林"
+*算法:
+    1. 选取一个起点节点src,做以下初始化:
+        1.1. "节点--距离"词典dr,代表节点到已经在树中的节点的最短距离,初始化为inf,dr[src]初始化为0
+        1.2. "节点--前继"词典pr,代表节点距离树最近的节点,初始化为None
+        1.3. "节点--访问"词典visit,代表节点是否被加入图中,初始化为False
+        1.3. 列表L,放入src,进行bfs
+    2. 选取L中最小dr的节点node,L.remove(node),visit[node]=True,对于每一个邻居节点neighbor做以下操作:
+        2.1. 如果dr[neighbor]> W(node,neighbor):
+            2.1.1. dr[neighbor]=W(node,neighbor)
+            2.1.2. pr[neighbor]=node
+            2.1.3. L.append(neighbor)
+    3. 在未入树的节点中,选取dr最小的节点node入树,并且visit[node]=True
+    4. 重复2 -- 3直到L为空,此时,每个已经被访问的节点node(除了起点),对应的边(pr[node],node)的集合,即最小生成树tree
+    5. tree加入代表森林的集合forest
+    6. 如果还有节点未被访问,新选取未访问的节点重复1 -- 5
+
+#*Kruskal算法,以边为基础,不断选边构成最小生成树
+*连续按照最小的权选边,当选取的边加到树里不成环的时候,选取该边
+*算法:
+    1. 以权值排序边,结果为列表L,升序
+    2. 对L中每个边edge,做以下操作:
+        2.1. 如果将edge加入树,不会成环,则加入边以及两个顶点
+        2.2. 如果加入edge成环则跳过
+    3. 最后得到的节点和选取的边的集合,就是最小生成树森林
+
+习题
+BISHI105 【模板】单源最短路Ⅰ ‖ 无权图：BFS 
+https://www.nowcoder.com/share/jump/1902545211781255375893
+
+BISHI106 【模板】单源最短路Ⅲ-A ‖ 非负权图：Dijkstra 
+https://www.nowcoder.com/share/jump/1902545211781255388533
+
+BISHI107 【模板】最小生成树Ⅰ ‖ 稀疏图：Kruskal 
+https://www.nowcoder.com/share/jump/1902545211781255399039
+
+ans - Prim:
+import sys
+import heapq
+Graph = list[set[tuple[int, int]]]
+istr = []
+for line in sys.stdin:
+    istr.append(line.split())
+n_nodes = int(istr[0][0])
+G_data = istr[1:]
+G: Graph = []
+for n in range(n_nodes + 1):
+    G.append(set())
+for data in G_data:
+    G[int(data[0])].add((int(data[1]), int(data[2])))
+    G[int(data[1])].add((int(data[0]), int(data[2])))
+def Nodes(G: Graph):
+    return list(range(1, len(G)))
+def Edges(G: Graph, node: int):
+    if node < len(G):
+        return G[node]
+    return []
+def Prim(G: Graph):
+    LenG = len(G)
+    dr = [float("inf") for _ in range(LenG)]
+    pr: list[tuple[Any, Any]] = [(None, None) for _ in range(LenG)]
+    visit = [False for _ in range(LenG)]
+    L = []
+    src = 1
+    heapq.heappush(L, (0, src))
+    dr[src] = 0
+    while L:
+        node = heapq.heappop(L)[1]
+        if visit[node]:
+            continue
+        visit[node] = True
+        for neighbor, weight in Edges(G, node):
+            if not visit[neighbor] and dr[neighbor] > weight:
+                dr[neighbor] = weight
+                heapq.heappush(L, (dr[neighbor], neighbor))
+                pr[neighbor] = (node, weight)
+    tree = []
+    path_weight = 0
+    for n in Nodes(G):
+        if n != src and visit[n] == True and pr[n]:
+            tree.append((pr[n][0], n))
+            path_weight += pr[n][1]
+    if not all(visit[node] for node in Nodes(G)):
+        print("NO")
+        exit()
+    else:
+        return (tree, path_weight)
+print(Prim(G)[1])
+
+ans - kruskal:
+import sys
+import heapq
+Graph = list[set[tuple[int, int]]]
+istr = []
+for line in sys.stdin:
+    istr.append(line.split())
+n_nodes = int(istr[0][0])
+n_edges= int(istr[0][1])
+if n_edges<n_nodes-1:
+    print("NO")
+    exit()
+Edges = istr[1:]
+for i in range(len(Edges)):
+    Edges[i]=(int(Edges[i][2]),int(Edges[i][0]),int(Edges[i][1]))
+NodeSet:list[int]=list(range(n_nodes+1))
+def Find(ns:list[int],a:int)->int:
+    if ns[a]==a:
+        return a
+    ns[a]=Find(ns,ns[a])
+    return ns[a]
+def AddEdge(ns:list[int],u:int,v:int)->bool:
+    uf=Find(ns,u)
+    vf=Find(ns,v)
+    if uf!=vf:
+        ns[uf]=vf
+        return True
+    return False
+heapq.heapify(Edges)
+path_weight=0
+mst_edges_count=0
+while Edges:
+    edge=heapq.heappop(Edges)
+    weight=edge[0]
+    u=edge[1]
+    v=edge[2]
+    uf=Find(NodeSet,u)
+    vf=Find(NodeSet,v)
+    if AddEdge(NodeSet,u,v):
+        path_weight+=weight
+        mst_edges_count+=1
+        continue
+    else:
+        continue
+if mst_edges_count<n_nodes-1:
+    print("NO")
+    exit()
+print(path_weight)

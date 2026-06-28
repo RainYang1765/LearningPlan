@@ -4,10 +4,8 @@ import networkx
 def GraphBFS(G: networkx.Graph):
     if not G:
         return None
-    #
     from collections import deque
 
-    #
     visit = {}
     for node in G.nodes:
         visit[node] = False
@@ -27,10 +25,8 @@ def GraphBFS(G: networkx.Graph):
 def DiGraphBFS(DG: networkx.DiGraph):
     if not DG:
         return None
-    #
     from collections import deque
 
-    #
     visit = {}
     for node in DG.nodes:
         visit[node] = False
@@ -89,3 +85,30 @@ def DiGraphDFS(DG: networkx.DiGraph):
     for node in DG.nodes:
         if not visit_flag[node]:
             _DGDFS(DG, node, visit_flag)
+
+
+def DiGraphDFS_IsLoop(DG: networkx.DiGraph):
+    if not DG:
+        return None
+
+    def _DGDFS(DG: networkx.DiGraph, start_node, visit: dict,prev:dict):
+        visit[start_node] += 1
+        print(f"Visiting node {start_node}")
+        for _, dst in DG.out_edges(start_node):
+            if not visit[dst]:
+                prev[dst]=start_node
+                _DGDFS(DG, dst, visit)
+            elif dst==prev[start_node]:
+                pass
+            elif visit[dst] and dst != prev[start_node]:
+                return False
+    prev = {}
+    visit_flag = {}
+    for node in DG.nodes:
+        visit_flag[node] = 0
+        prev = {}
+    for node in DG.nodes:
+        if not visit_flag[node]:
+            if not _DGDFS(DG,node,visit_flag,prev):
+                return False
+    return True

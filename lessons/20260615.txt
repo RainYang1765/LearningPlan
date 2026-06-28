@@ -1,0 +1,112 @@
+REAL795 图上染色 
+https://www.nowcoder.com/share/jump/8528677901781512450673
+
+ans - Disjoint Set:
+n, m, q = map(int, input().split())
+Graph = list[set[int]]
+G: Graph = [set() for n in range(n + 1)]
+for _ in range(m):
+    u, v = map(int, input().split())
+    G[u].add(v)
+    G[v].add(u)
+#
+class DisjSet:
+    def __init__(self) -> None:
+        self.parent: dict[int, int] = {}
+        self.sz: dict[int, int] = {}
+        return
+
+    def Find(self, a: int) -> int:
+        if a not in self.parent:
+            self.parent[a] = a
+            self.sz[a] = 1
+        if self.parent[a] == a:
+            return a
+        self.parent[a] = self.Find(self.parent[a])
+        return self.parent[a]
+
+    def Union(self, a: int, b: int) -> bool:
+        af = self.Find(a)
+        bf = self.Find(b)
+        if af != bf:
+            if self.sz[af] > self.sz[bf]:
+                af, bf = bf, af
+            self.parent[af] = bf
+            self.sz[bf] += self.sz[af]
+            return True
+        return False
+
+
+class Colors:
+    def __init__(self) -> None:
+        self.NodesColors: dict[int, int] = {}  # PerNode
+        self.ColorsPaths: dict[int, DisjSet] = {}  # PerColor
+        self.MaxPart: dict[int, int] = {}  # PerColor
+        return
+
+    def PaintNode(self, G: Graph, node: int, color: int) -> None:
+        self.NodesColors[node] = color
+        if color not in self.ColorsPaths:
+            self.ColorsPaths[color] = DisjSet()
+        self.ColorsPaths[color].Find(node)  # explcit add node , union later
+        if color not in self.MaxPart:
+            self.MaxPart[color] = 0
+        prev_max = self.MaxPart[color]
+        for neighbor in G[node]:
+            if neighbor not in self.NodesColors:
+                self.NodesColors[neighbor] = 0
+            if self.NodesColors[neighbor] == color:
+                self.ColorsPaths[color].Union(node, neighbor) # union node with neighbors
+        nodef = self.ColorsPaths[color].Find(node)
+        self.MaxPart[color] = max(self.ColorsPaths[color].sz[nodef], prev_max)
+        return
+    
+    def MaxPartNum(self)->int:
+        return max(self.MaxPart.values())
+
+#
+C=Colors()
+for _ in range(q):
+    x,c=map(int,input().split())
+    C.PaintNode(G,x,c)
+    print(C.MaxPartNum())
+
+REAL818 流言终结者
+https://www.nowcoder.com/share/jump/8528677901781526455351
+
+ans:
+from collections import deque
+n, m, q = map(int, input().split())
+Graph = list[set[int]]
+G: Graph = [set() for _ in range(n + 1)]
+for _ in range(m):
+    u, v = map(int, input().split())
+    G[u].add(v)
+    G[v].add(u)
+n_type = [0] + list(map(int, input().split()))
+q = list(map(int, input().split()))
+connected_parts: list[set[int]] = []
+parts_id = -1
+parts_lens: dict[int, int] = {}
+nodes_ids: dict[int, int] = {}  # nodes -- parts_id
+for node in range(1, n + 1):
+    if n_type[node] == 1 and (node not in nodes_ids):
+        parts_id += 1
+        connected_parts.append(set())
+        L = deque([node])
+        while L:
+            n = L.popleft()
+            if n in connected_parts[parts_id]:
+                continue
+            connected_parts[parts_id].add(n)
+            nodes_ids[n] = parts_id
+            if n_type[n] == 1:
+                for neighbor in G[n]:
+                    L.append(neighbor)
+        parts_lens[parts_id] = len(connected_parts[parts_id])
+for start in q:
+    if n_type[start]==2:
+        print(1)
+        continue
+    else:
+        print(parts_lens[nodes_ids[start]])

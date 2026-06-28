@@ -1,0 +1,281 @@
+*一个问题,如果由初始条件可以得到一个简单情形的**最优解**S0 , 并且由S0可以得到稍复杂情况的解S1 , 由**同样**的策略最后得到最优解或者次优解 , 这类算法统称为贪心算法
+*学过的算法中,拓扑排序,Dijkstra,Prim,Kruskal都是贪心算法的例子
+*比如Kruskal算法中,开始以及之后每个阶段中,"选择一个权值最小的边"(先不管有没有环),这个策略总是最优的,最后得到的也是全局最优的最小生成树
+*贪心算法是分阶段执行的,重点在于看出初始状态下,最简单情形的解决方法,以及如何从简单情形扩展到复杂情形,这是极度需要分析经验的事情
+*重点是多做题,从易到难,记忆模式
+
+[例题1]
+BISHI43 讨厌鬼进货 
+https://www.nowcoder.com/share/jump/8045440981781612404456
+
+贪心策略: 对当前要进的货,选择一个小的和线下价格总和累加,如果大于了线上总价,选线上,反之选线下
+最简单情形: 只进一个货,把两家单价和网上总价对比,三者选最小
+情形扩展: 已经进了n个货,线下总价S,现在进第n+1个货,执行贪心策略
+
+[例题2]
+BISHI44 灵异背包？ 
+https://www.nowcoder.com/share/jump/8045440981781615120937
+
+策略1:
+贪心策略:从最大的数开始选,要么选一个偶数,要么选两个奇数
+最简单情形:降序排列后,1-第一个是偶数2-前两个是奇数3-有奇数有偶数
+情形扩展:情况3,弹出奇数备用,对剩余序列执行同样的贪心策略
+
+策略2:
+策略:全部求和,如果不是偶数,减去其中最小奇数
+*我认为这不是很算贪心算法,因为它并没有分阶段解决,而是整体处理
+
+ans1:
+from collections import deque
+
+
+def main():
+    n = int(input())
+    an = list(map(int, input().split()))
+    an.sort(reverse=True)
+    aq = deque(an)
+    sum_an = 0
+    a_iseven = True
+    odd_slot = 0
+    while aq:
+        a = aq.popleft()
+        a_iseven = True if a % 2 == 0 else False
+        if a_iseven:
+            sum_an += a
+            continue
+        else:
+            if odd_slot:
+                odd_slot += a
+                sum_an += odd_slot
+                odd_slot = 0
+                continue
+            else:
+                odd_slot += a
+                continue
+    print(sum_an)
+    return
+
+
+if __name__ == "__main__":
+    main()
+    exit()
+
+ans2:
+from heapq import heapify,heappop
+def main():
+    n = int(input())
+    an = list(map(int, input().split()))
+    sum_an=sum(an)
+    if sum_an%2==0:
+        print(sum_an)
+        return
+    heapify(an)
+    a=0
+    while a%2==0:
+        a=heappop(an)
+    print(sum_an-a)
+    return
+
+
+if __name__ == "__main__":
+    main()
+    exit()
+
+[例题3]
+BISHI45 小红的矩阵染色 
+https://www.nowcoder.com/share/jump/8045440981781619505749
+
+贪心策略: 首先选取最大连续块染色
+最简单情形: 挑选最大连续块染色
+扩展情形: 在剩余连续块中选择最大连续块染色
+
+ans:
+from collections import deque
+
+def main():
+    n, _, k = map(int, input().split())
+    if k == 1:
+        print(0)
+    #
+    G = []
+    for _ in range(n):
+        G.append(input())
+    max_connected = []
+    for col in zip(*G):
+        for sub_str in ("".join(col)).split("*"):
+            temp_len = len(sub_str)
+            if temp_len > 1:
+                # max_connected.append(-temp_len) # use max heap slower compare to deque, 123ms -> 193ms
+                max_connected.append(temp_len)
+            else:
+                continue
+    max_connected.sort(reverse=True)
+    # heapify(max_connected) # use max heap slower compare to deque, 123ms -> 193ms
+    maxq = deque(max_connected)
+    final_score = 0
+    # while max_connected and k > 1: # use max heap slower compare to deque, 123ms -> 193ms
+    while maxq and k > 1:
+        part = maxq.popleft()
+        # part=-heappop(max_connected) # use max heap slower compare to deque, 123ms -> 193ms
+        if part <= k:
+            k -= part
+            final_score += part - 1
+            continue
+        else:
+            final_score += k - 1
+            k = 0
+            continue
+    print(final_score)
+    return
+
+
+if __name__ == "__main__":
+    main()
+    exit()
+
+[例题4]
+BISHI46 小红的魔法药剂 
+https://www.nowcoder.com/share/jump/8045440981781621274278
+
+策略1
+贪心策略:对于每一个药剂,如果合成便宜就合成,反之直接购买
+最简单情形:只有一种药直接购买
+扩展情形:对于多种药,优先考虑合成方案,执行贪心策略
+
+策略2:
+贪心策略:每次选最便宜的,选完为止
+最简单情形:只有一种药直接购买
+扩展情形:多种药,先加入合成方案,后按价格红蓝混合排序,选一个最小的,继续执行贪心策略
+
+ans:
+def main():
+    n=int(input())
+    red_price=[0]+list(map(int,input().split()))
+    total_price=0
+    for j in range(1,n+1):
+        b,c=map(int,input().split())
+        temp_p=red_price[b]+red_price[c]
+        if temp_p<red_price[j]:
+            total_price+=temp_p
+        else:
+            total_price+=red_price[j]
+    print(total_price)
+    return
+
+if __name__=="__main__":
+    main()
+    exit()
+
+[例题5]
+BISHI47 交换到最大 
+https://www.nowcoder.com/share/jump/8045440981781672161032
+
+贪心策略:从最高位开始,向右寻找可以交换的数
+最简单情形:18,直接交换
+扩展情形:每次交换后的结果,继续执行贪心策略
+
+ans:
+from collections import deque
+from sys import stdin
+from typing import Iterator
+def SwapMax(s_iter:Iterator[str]) -> str:
+    left = deque()  # 已确定的前缀（栈），存放 int
+    buf = deque()  # 被当前数“跨过”的元素临时存放
+    for ch in s_iter:
+        x=int(ch)
+        while left and x > 0 and (x - 1) > left[-1]:
+            # 尽量把 x 往左挪：挪一步后会变成 x-1，只有 x-1 > 左邻 才值得挪
+            buf.append(left.pop())  # 跨过一个
+            x -= 1
+        left.append(x)
+        while buf:
+            left.append(buf.pop())# 把被跨过的元素按原顺序放回去
+    return "".join(str(v) for v in left)
+def main():
+    iiter = iter(stdin.read().split())
+    t = int(next(iiter))
+    for _ in range(t):
+        print(SwapMax(iter(next(iiter))))
+    return
+if __name__ == "__main__":
+    main()
+    exit()
+
+[例题6]
+BISHI48 小红的整数配对 
+https://www.nowcoder.com/share/jump/8045440981781676202308
+
+贪心策略:从最大的,差值小于k的两个数开始累加乘积
+最简单情形:1个数或者2个
+扩展情形:排序后反复执行策略
+
+ans:
+from sys import stdin
+def main():
+    istr = iter(stdin.read().split())
+    n, k = (int(next(istr)), int(next(istr)))
+    if n==1:
+        print(0)
+        return
+    a = [0 for _ in range(n)]
+    for j in range(n):
+        a[j] = int(next(istr))
+    a.sort(reverse=True)
+    total=0
+    i=0
+    while i<n-1:
+        if a[i]-a[i+1]<=k:
+            total+=a[i]*a[i+1]
+            i+=2
+            continue
+        else:
+            i+=1
+            continue
+    print(total)
+    return
+if __name__ == "__main__":
+    main()
+    exit()
+
+[例题7]
+REAL586 【模板】二分图结构Ⅰ-A ‖ 染色判定：DFS
+https://www.nowcoder.com/share/jump/8045440981781683566170
+
+贪心策略:检查所有已染色点的邻居,如果已染色但与父节点相同,则不是二分图
+最简单情形:
+扩展情形:
+
+ans:
+Graph = list[set[int]]  # ignore double edges
+from sys import stdin,setrecursionlimit
+def main():
+    is_bigraph = True
+    def _dfs(G: Graph, color_set: dict[int, bool], start: int, next_color: bool):
+        nonlocal is_bigraph
+        if start in color_set:
+            if color_set[start] != next_color:
+                is_bigraph = False
+                return
+        else:
+            color_set[start] = next_color
+            for neighbor in G[start]:
+                _dfs(G, color_set, neighbor, (not next_color))
+        return
+    istr = iter(stdin.read().split())
+    n, m = (int(next(istr)), int(next(istr)))
+    G: Graph = [set() for _ in range(n)]
+    for _ in range(m):
+        u, v = (int(next(istr)), int(next(istr)))
+        G[u - 1].add(v - 1)
+        G[v - 1].add(u - 1)
+    nodes_color: dict[int, bool] = {}  # False for red , True for black
+    for node in range(n):
+        if node not in nodes_color:
+            _dfs(G, nodes_color, node, False)
+    print(("YES" if is_bigraph else "NO"))
+    return
+if __name__ == "__main__":
+    setrecursionlimit(2000000)
+    main()
+    exit()
+

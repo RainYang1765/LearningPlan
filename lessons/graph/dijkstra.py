@@ -22,11 +22,11 @@ def GraphDijkstra(G: networkx.Graph, src, dst) -> tuple | None:
     #
     while visit:
         node = visit.popleft()
-        for _, dst in G.edges(node):
-            if dist[dst] > dist[node] + 1:
-                dist[dst] = dist[node] + 1
-                prev[dst] = node
-                visit.append(dst)
+        for _, neighbor in G.edges(node):
+            if dist[neighbor] > dist[node] + 1:
+                dist[neighbor] = dist[node] + 1
+                prev[neighbor] = node
+                visit.append(neighbor)
     #
     node = dst
     while node:
