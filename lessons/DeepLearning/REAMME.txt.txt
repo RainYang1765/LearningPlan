@@ -1,0 +1,8 @@
+Pytorch + GraalPy + Java  + Spring Boot +  TypeScript + Vue
+融合度比较高, 减少进程间RPC损耗, 高风险
+
+Pytorch + BRPC/gRPC + Java + SpringBoot + TypeScript + Vue
+风险低, 常用方案
+
+Pytorch + TorchServe + Java + SpringBoot + TypeScript + Vue
+Pytorch推荐
